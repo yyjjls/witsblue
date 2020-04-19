@@ -1,6 +1,12 @@
 package com.example.witsblue;
 
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
+import com.example.witsbluelibrary.induce.Induce;
+
 import io.flutter.app.FlutterActivity;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -20,11 +26,12 @@ public class BlueManager implements MethodChannel.MethodCallHandler {
         BlueManager instance = new BlueManager(activity);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onMethodCall(MethodCall call, MethodChannel.Result result) {
         //开启感应开锁
         if (call.method.equals("openInduceUnlock")) {
-            result.success(true);
+            result.success(Induce.instance().openInduceUnlock());
         }
     }
 
