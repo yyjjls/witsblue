@@ -2,7 +2,6 @@ import 'package:flutter/services.dart';
 
 class WitsBlue {
   static const platform = const MethodChannel('witsystem.top/blue');
-
   ///开启感应开锁
   Future<bool> openInduceUnlock() async {
     try {
