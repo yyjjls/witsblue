@@ -4,15 +4,14 @@ import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.ParcelUuid;
 import android.util.Log;
 
-import androidx.annotation.RequiresApi;
 
 import com.example.witsbluelibrary.rouse.Rouse;
 
@@ -32,6 +31,8 @@ public final class Induce implements InduceUnlock {
 
     private static final int REQUEST_CODE = 0x01;
 
+    private BluetoothManager bluetoothManager;
+
     private static Induce induce;
 
     public static Induce instance(Context context) {
@@ -48,7 +49,7 @@ public final class Induce implements InduceUnlock {
 
     private Induce(Context context) {
         this.context = context;
-        BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+        bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         assert bluetoothManager != null;
         blueAdapter = bluetoothManager.getAdapter();
     }
@@ -80,9 +81,9 @@ public final class Induce implements InduceUnlock {
         scanFilterList.add(scanFilter);
         //指定蓝牙的方式，这里设置的ScanSettings.SCAN_MODE_LOW_LATENCY是比较高频率的扫描方式
         ScanSettings.Builder settingBuilder = new ScanSettings.Builder();
-       // settingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
-        //settingBuilder.setScanMode(ScanSettings.SCAN_MODE_BALANCED);
-        settingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);//高功耗
+        // settingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
+        settingBuilder.setScanMode(ScanSettings.SCAN_MODE_BALANCED);
+        //settingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);//高功耗
         //settingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER);
         //settingBuilder.setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE);
         settingBuilder.setMatchMode(ScanSettings.MATCH_MODE_STICKY);
@@ -104,15 +105,19 @@ public final class Induce implements InduceUnlock {
         ///启动定时器
         Rouse.instance(context).startRouse();
         Log.e("开启感应开锁", "开启感应开锁");
+
         return true;
     }
 
 
     // 关闭感应开锁
     public boolean stopInduceUnlock() {
+        //关闭定时器
+        Rouse.instance(context).stopRouse();
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return false;
         }
+        //关闭后台扫描
         Intent intent = new Intent(SERVICE_PATH)
                 .setPackage(context.getPackageName());
         PendingIntent callbackIntent = PendingIntent.getForegroundService(
@@ -122,7 +127,8 @@ public final class Induce implements InduceUnlock {
                 PendingIntent.FLAG_UPDATE_CURRENT);
         blueAdapter.getBluetoothLeScanner().stopScan(callbackIntent);
         context.stopService(intent);
-        Rouse.instance(context).stopRouse();
+        //断开所有连接
+        Log.e("关闭服务", "关闭服务成功");
         return true;
     }
 

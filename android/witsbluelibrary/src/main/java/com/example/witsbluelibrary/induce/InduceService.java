@@ -17,17 +17,19 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.example.witsbluelibrary.R;
+import com.example.witsbluelibrary.unlock.DistanceUnlock;
 
 import java.util.List;
 
 
 //后台开门
-public class BleBackstageScanService extends Service {
+public class InduceService extends Service {
 
     private NotificationManager notificationManager;
     private NotificationCompat.Builder builder;
     private Notification notification;
     private final static int notifyId = 0x023;
+    private boolean tag = false;
 
     @Nullable
     @Override
@@ -51,28 +53,24 @@ public class BleBackstageScanService extends Service {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
             return START_STICKY;
         }
-
         int errorCode = intent.getIntExtra(BluetoothLeScanner.EXTRA_ERROR_CODE, -1);
-        //List<ScanResult> scanResults = (List<ScanResult>) (intent.getSerializableExtra(BluetoothLeScanner.EXTRA_LIST_SCAN_RESULT));
-
         //获取到的蓝牙设备的回调类型
-        int callbackType = intent.getIntExtra(BluetoothLeScanner.EXTRA_CALLBACK_TYPE, -1);//ScanSettings.CALLBACK_TYPE_*
+        // int callbackType = intent.getIntExtra(BluetoothLeScanner.EXTRA_CALLBACK_TYPE, -1);//ScanSettings.CALLBACK_TYPE_*
+        //Log.e("启动服务2", "获取到的蓝牙设备的回调类型" +callbackType);
         if (errorCode == -1) {
             //扫描到蓝牙设备信息
             List<ScanResult> scanResults = (List<ScanResult>) (intent.getSerializableExtra(BluetoothLeScanner.EXTRA_LIST_SCAN_RESULT));
             if (scanResults != null) {
                 for (ScanResult result : scanResults) {
-                    // list.add(result);
                     BluetoothDevice device = result.getDevice();
-                    Log.e("启动服务2", "获得设备" + device.getName());
-                    //  openDevice(device, result.getRssi());
+                    Log.e("启动服务2", "获得设备" + device.getName() + ":::" + result.getRssi());
+                    if (!tag)
+                        DistanceUnlock.instance(getApplication()).connectDeviceRanging(result);
+                    tag = true;
                 }
             }
         }
-
-
         return START_STICKY;
-
     }
 
 
@@ -107,4 +105,10 @@ public class BleBackstageScanService extends Service {
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ///回收连接资源
+        DistanceUnlock.instance(getApplication()).close();
+    }
 }

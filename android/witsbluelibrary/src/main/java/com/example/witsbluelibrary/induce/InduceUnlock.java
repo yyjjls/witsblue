@@ -1,11 +1,7 @@
 package com.example.witsbluelibrary.induce;
 
-import android.content.Context;
 
 public interface InduceUnlock {
-
-
-
 
     //是否支持感应开锁
     boolean isReaction();

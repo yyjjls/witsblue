@@ -1,7 +1,6 @@
 package com.example.witsblue;
 
 
-import android.content.Intent;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;

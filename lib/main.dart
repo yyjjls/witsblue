@@ -70,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
             FlatButton(
               child: Text('关闭'),
               onPressed: () async {
-                bool b = await WitsBlue().openInduceUnlock();
+                bool b = await WitsBlue().stopInduceUnlock();
                 print('关闭返回值：${b}');
                 _counter = '已关闭$b';
                 setState(() {});

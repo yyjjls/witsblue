@@ -51,7 +51,7 @@
         </service>
 
         <service
-            android:name="com.example.witsbluelibrary.induce.BleBackstageScanService"
+            android:name="com.example.witsbluelibrary.induce.InduceService"
             android:enabled="true"
             android:process=":inductionUnLock2">
             <intent-filter>

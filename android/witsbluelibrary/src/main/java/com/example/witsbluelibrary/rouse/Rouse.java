@@ -39,8 +39,7 @@ public class Rouse {
         }
         Intent alarmIntent = new Intent(context, RouseService.class).setAction(ACTION);
         PendingIntent pendingIntent = PendingIntent.getService(context, 0, alarmIntent, 0);
-       // alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), pendingIntent);
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10000, pendingIntent);
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 30000, pendingIntent);
         Log.e("定时任务", "开启定时器" );
         return true;
     }
@@ -51,6 +50,7 @@ public class Rouse {
         Intent alarmIntent = new Intent(context, RouseService.class).setAction(ACTION);
         PendingIntent pendingIntent = PendingIntent.getService(context, 0, alarmIntent, 0);
         alarmManager.cancel(pendingIntent);
+        context.stopService(alarmIntent);
         return true;
     }
 

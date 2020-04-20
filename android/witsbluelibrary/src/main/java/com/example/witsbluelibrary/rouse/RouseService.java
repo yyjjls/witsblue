@@ -34,7 +34,6 @@ public class RouseService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-
         return null;
     }
 
@@ -42,7 +41,6 @@ public class RouseService extends Service {
     public void onCreate() {
         super.onCreate();
         Notification("定时任务");
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -50,7 +48,6 @@ public class RouseService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e("定时任务", "定时任务启动服务" + startId);
         Induce.instance(getApplication()).openInduceUnlock();
-       // Rouse.instance(getApplication()).startRouse();
         return START_STICKY;
 
     }
