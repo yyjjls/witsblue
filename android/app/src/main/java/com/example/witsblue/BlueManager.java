@@ -6,7 +6,6 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.witsbluelibrary.induce.BleBackstageScanService;
 import com.example.witsbluelibrary.induce.Induce;
 
 import io.flutter.app.FlutterActivity;
@@ -34,6 +33,8 @@ public class BlueManager implements MethodChannel.MethodCallHandler {
         //开启感应开锁
         if (call.method.equals("openInduceUnlock")) {
             result.success(Induce.instance(activity.getApplication()).openInduceUnlock());
+        } else if (call.method.equals("stopInduceUnlock")) {
+            result.success(Induce.instance(activity.getApplication()).stopInduceUnlock());
         }
     }
 

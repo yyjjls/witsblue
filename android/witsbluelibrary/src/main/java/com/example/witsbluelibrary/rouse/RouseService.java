@@ -1,4 +1,4 @@
-package com.example.witsbluelibrary.induce;
+package com.example.witsbluelibrary.rouse;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -14,15 +14,17 @@ import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.example.witsbluelibrary.R;
+import com.example.witsbluelibrary.induce.Induce;
 
 import java.util.List;
 
 
-//后台开门
-public class BleBackstageScanService extends Service {
+//定时器
+public class RouseService extends Service {
 
     private NotificationManager notificationManager;
     private NotificationCompat.Builder builder;
@@ -39,38 +41,16 @@ public class BleBackstageScanService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Notification("感应开锁已经开启");
+        Notification("定时任务");
+
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e("启动服务", "启动服务" + startId);
-        // Notification("测试");
-        //扫描到蓝牙设备信息
-        //获取返回的错误码
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
-            return START_STICKY;
-        }
-
-        int errorCode = intent.getIntExtra(BluetoothLeScanner.EXTRA_ERROR_CODE, -1);
-        //List<ScanResult> scanResults = (List<ScanResult>) (intent.getSerializableExtra(BluetoothLeScanner.EXTRA_LIST_SCAN_RESULT));
-
-        //获取到的蓝牙设备的回调类型
-        int callbackType = intent.getIntExtra(BluetoothLeScanner.EXTRA_CALLBACK_TYPE, -1);//ScanSettings.CALLBACK_TYPE_*
-        if (errorCode == -1) {
-            //扫描到蓝牙设备信息
-            List<ScanResult> scanResults = (List<ScanResult>) (intent.getSerializableExtra(BluetoothLeScanner.EXTRA_LIST_SCAN_RESULT));
-            if (scanResults != null) {
-                for (ScanResult result : scanResults) {
-                    // list.add(result);
-                    BluetoothDevice device = result.getDevice();
-                    Log.e("启动服务2", "获得设备" + device.getName());
-                    //  openDevice(device, result.getRssi());
-                }
-            }
-        }
-
-
+        Log.e("定时任务", "定时任务启动服务" + startId);
+        Induce.instance(getApplication()).openInduceUnlock();
+       // Rouse.instance(getApplication()).startRouse();
         return START_STICKY;
 
     }
@@ -97,7 +77,7 @@ public class BleBackstageScanService extends Service {
             builder.setDefaults(NotificationCompat.FLAG_ONLY_ALERT_ONCE);
             builder.setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle(aMessage)
-                    .setContentText("等待设备中..");
+                    .setContentText("定时任务..");
 
             notification = builder.build();
             notification.flags = Notification.FLAG_ONGOING_EVENT;

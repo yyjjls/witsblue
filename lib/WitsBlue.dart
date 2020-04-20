@@ -12,4 +12,15 @@ class WitsBlue {
       return false;
     }
   }
+
+  ///关闭感应开锁
+  Future<bool> stopInduceUnlock() async {
+    try {
+      final bool result = await platform.invokeMethod('stopInduceUnlock');
+      return result;
+    } on PlatformException catch (e) {
+      print('调用关闭失败');
+      return false;
+    }
+  }
 }

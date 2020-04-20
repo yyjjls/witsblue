@@ -36,13 +36,24 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-      <!--  android:process=":inductionUnLock2"-->
+        <!--  android:process=":inductionUnLock2"-->
+
+
+
+        <service
+            android:name="com.example.witsbluelibrary.rouse.RouseService"
+            android:enabled="true"
+            android:process=":inductionUnLock1">
+            <intent-filter>
+                <action android:name="com.example.witsbluelibrary.rouse.RouseService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
 
         <service
             android:name="com.example.witsbluelibrary.induce.BleBackstageScanService"
             android:enabled="true"
-            android:process=":inductionUnLock2"
-         >
+            android:process=":inductionUnLock2">
             <intent-filter>
                 <action android:name="com.example.witsbluelibrary.induce.BleBackstageScanService" />
                 <category android:name="android.intent.category.DEFAULT" />

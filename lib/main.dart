@@ -46,8 +46,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-  String _counter='0';
+  String _counter = '等待开启';
 
   @override
   Widget build(BuildContext context) {
@@ -59,19 +58,28 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('You have pushed the button this many times:'),
-            Text('$_counter', style: Theme.of(context).textTheme.display1),
+            Text('$_counter'),
+            FlatButton(
+                child: Text('开启'),
+                onPressed: () async {
+                  bool b = await WitsBlue().openInduceUnlock();
+                  print('开启返回值：${b}');
+                  _counter = '开启成功$b';
+                  setState(() {});
+                }),
+            FlatButton(
+              child: Text('关闭'),
+              onPressed: () async {
+                bool b = await WitsBlue().openInduceUnlock();
+                print('关闭返回值：${b}');
+                _counter = '已关闭$b';
+                setState(() {});
+              },
+            ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-           bool b = await WitsBlue().openInduceUnlock();
-          print('返回值：${b}') ;
-        },
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
