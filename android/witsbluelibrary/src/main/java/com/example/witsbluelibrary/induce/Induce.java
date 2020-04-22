@@ -82,8 +82,8 @@ public final class Induce implements InduceUnlock {
         //指定蓝牙的方式，这里设置的ScanSettings.SCAN_MODE_LOW_LATENCY是比较高频率的扫描方式
         ScanSettings.Builder settingBuilder = new ScanSettings.Builder();
         // settingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
-        settingBuilder.setScanMode(ScanSettings.SCAN_MODE_BALANCED);
-        //settingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);//高功耗
+        //settingBuilder.setScanMode(ScanSettings.SCAN_MODE_BALANCED);
+        settingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);//高功耗
         //settingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER);
         //settingBuilder.setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE);
         settingBuilder.setMatchMode(ScanSettings.MATCH_MODE_STICKY);

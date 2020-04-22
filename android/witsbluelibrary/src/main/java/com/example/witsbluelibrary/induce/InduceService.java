@@ -64,9 +64,8 @@ public class InduceService extends Service {
                 for (ScanResult result : scanResults) {
                     BluetoothDevice device = result.getDevice();
                     Log.e("启动服务2", "获得设备" + device.getName() + ":::" + result.getRssi());
-                    if (!tag)
                         DistanceUnlock.instance(getApplication()).connectDeviceRanging(result);
-                    tag = true;
+
                 }
             }
         }
