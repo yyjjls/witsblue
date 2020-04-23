@@ -63,61 +63,68 @@ public class DistanceUnlock {
         return distanceUnlock;
     }
 
-
+    long ll;
     ///连接设备进行距离判断
     public void connectDeviceRanging(ScanResult scanResult) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            return;
-        }
-        if (scanResult.getRssi() < -60) {
-            return;
-        }
-        //如果不为空代表已经有连接
-        if (gatt != null) {
-            return;
-        }
-        gatt = scanResult.getDevice().connectGatt(context, false, new BluetoothGattCallback() {
-            @Override
-            public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-                super.onConnectionStateChange(gatt, status, newState);
-                Log.e("启动服务", "连接状态：" + status + ":::" + newState);
-                if (newState == BluetoothProfile.STATE_CONNECTED) {
+        synchronized (DistanceUnlock.class){
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                return;
+            }
+            if (scanResult.getRssi() < -60) {
+                return;
+            }
+            //如果不为空代表已经有连接
+            if (gatt != null) {
+                return;
+            }
+            ll=System.currentTimeMillis();
+            gatt = scanResult.getDevice().connectGatt(context, false, new BluetoothGattCallback() {
+                @Override
+                public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+                    super.onConnectionStateChange(gatt, status, newState);
+                    Log.e("启动服务", "连接状态：" + status + ":::" + newState);
+                    if (newState == BluetoothProfile.STATE_CONNECTED) {
+                        Log.e("启动服务", "连接耗时：" + (System.currentTimeMillis()-ll));
+                        gatt.discoverServices();
+                    } else {
+                        close();
+                    }
+                }
+
+                @Override
+                public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+                    super.onServicesDiscovered(gatt, status);
+                    Log.e("启动服务", "发现服务耗时：" + (System.currentTimeMillis()-ll));
+                   // sendUnlockInfo(gatt);
                     readRssi(gatt);
-                } else {
-                    close();
                 }
-            }
 
-            @Override
-            public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-                super.onServicesDiscovered(gatt, status);
-                sendUnlockInfo(gatt);
-            }
-
-            @Override
-            public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-                super.onCharacteristicRead(gatt, characteristic, status);
-                if (characteristic.getUuid().toString().toLowerCase().equals(TOKEN.toLowerCase())) {
-                    readToken(gatt, characteristic.getValue());
+                @Override
+                public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+                    super.onCharacteristicRead(gatt, characteristic, status);
+                    if (characteristic.getUuid().toString().toLowerCase().equals(TOKEN.toLowerCase())) {
+                        readToken(gatt, characteristic.getValue());
+                    }
                 }
-            }
 
-            @Override
-            public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-                super.onCharacteristicWrite(gatt, characteristic, status);
-            }
+                @Override
+                public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+                    super.onCharacteristicWrite(gatt, characteristic, status);
+                }
 
-            @Override
-            public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-                super.onCharacteristicChanged(gatt, characteristic);
-            }
+                @Override
+                public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+                    super.onCharacteristicChanged(gatt, characteristic);
+                }
 
-            @Override
-            public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
-                super.onReadRemoteRssi(gatt, rssi, status);
-                handlerReadRssiValue(gatt, rssi);
-            }
-        });
+                @Override
+                public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
+                    super.onReadRemoteRssi(gatt, rssi, status);
+                    handlerReadRssiValue(gatt, rssi);
+                }
+            });
+        }
+
     }
 
     //不断读取信号
@@ -215,6 +222,7 @@ public class DistanceUnlock {
         unlock.setValue(openLockData);
         gatt.writeCharacteristic(unlock);
         Log.e("启动服务", "开门成功》》》》》》》》》》》》》》》》》》》》》》》》》》》》");
+        Log.e("启动服务", "开门耗时耗时：" + (System.currentTimeMillis()-ll));
     }
 
 
