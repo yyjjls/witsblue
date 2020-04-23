@@ -25,6 +25,9 @@ import java.util.UUID;
  */
 public class DistanceUnlock {
 
+    //开门信号
+    private int unlockRssi = -40;
+
     private static final String SERVICES = "0000fff1-0000-1000-8000-00805f9b34fb";
 
     /**
@@ -64,27 +67,28 @@ public class DistanceUnlock {
     }
 
     long ll;
+
     ///连接设备进行距离判断
     public void connectDeviceRanging(ScanResult scanResult) {
-        synchronized (DistanceUnlock.class){
+        synchronized (DistanceUnlock.class) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 return;
             }
-            if (scanResult.getRssi() < -60) {
+            if (scanResult.getRssi() < (unlockRssi - 20)) {
                 return;
             }
             //如果不为空代表已经有连接
             if (gatt != null) {
                 return;
             }
-            ll=System.currentTimeMillis();
+            ll = System.currentTimeMillis();
             gatt = scanResult.getDevice().connectGatt(context, false, new BluetoothGattCallback() {
                 @Override
                 public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
                     super.onConnectionStateChange(gatt, status, newState);
                     Log.e("启动服务", "连接状态：" + status + ":::" + newState);
                     if (newState == BluetoothProfile.STATE_CONNECTED) {
-                        Log.e("启动服务", "连接耗时：" + (System.currentTimeMillis()-ll));
+                        Log.e("启动服务", "连接耗时：" + (System.currentTimeMillis() - ll));
                         gatt.discoverServices();
                     } else {
                         close();
@@ -94,8 +98,8 @@ public class DistanceUnlock {
                 @Override
                 public void onServicesDiscovered(BluetoothGatt gatt, int status) {
                     super.onServicesDiscovered(gatt, status);
-                    Log.e("启动服务", "发现服务耗时：" + (System.currentTimeMillis()-ll));
-                   // sendUnlockInfo(gatt);
+                    Log.e("启动服务", "发现服务耗时：" + (System.currentTimeMillis() - ll));
+                    // sendUnlockInfo(gatt);
                     readRssi(gatt);
                 }
 
@@ -171,10 +175,10 @@ public class DistanceUnlock {
             sum += integer;
         }
         sum = sum / rssiList.size();
-        if (sum < -60) {
+        if (sum < (unlockRssi - 20)) {
             Log.e("启动服务", "》》》》》》》》》》》》断开设备》》》》》》》》》》》》》》》》》》》》》》》》》》》》");
             close();
-        } else if (sum > -38) {
+        } else if (sum > unlockRssi) {
             //Log.e("启动服务", "开门成功》》》》》》》》》》》》》》》》》》》》》》》》》》》》");
             if (gatt.getServices().size() == 0) {
                 gatt.discoverServices();
@@ -222,7 +226,7 @@ public class DistanceUnlock {
         unlock.setValue(openLockData);
         gatt.writeCharacteristic(unlock);
         Log.e("启动服务", "开门成功》》》》》》》》》》》》》》》》》》》》》》》》》》》》");
-        Log.e("启动服务", "开门耗时耗时：" + (System.currentTimeMillis()-ll));
+        Log.e("启动服务", "开门耗时耗时：" + (System.currentTimeMillis() - ll));
     }
 
 

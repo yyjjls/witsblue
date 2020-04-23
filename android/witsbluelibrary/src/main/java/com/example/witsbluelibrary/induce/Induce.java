@@ -13,6 +13,8 @@ import android.os.Build;
 import android.util.Log;
 
 
+import androidx.annotation.RequiresApi;
+
 import com.example.witsbluelibrary.rouse.Rouse;
 
 import java.util.ArrayList;
@@ -101,7 +103,7 @@ public final class Induce implements InduceUnlock {
         //启动蓝牙扫描
         blueAdapter.getBluetoothLeScanner().startScan(scanFilterList, settings, callbackIntent);
         //启动服务
-        //context.startService(intent);
+        context.startService(intent);
         ///启动定时器
         Rouse.instance(context).startRouse();
         Log.e("开启感应开锁", "开启感应开锁");
@@ -117,6 +119,15 @@ public final class Induce implements InduceUnlock {
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return false;
         }
+        //关闭扫描并且停止当前服务
+        context.stopService(stopScan());
+        return true;
+    }
+
+
+    ///关闭扫描
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public Intent stopScan() {
         //关闭后台扫描
         Intent intent = new Intent(SERVICE_PATH)
                 .setPackage(context.getPackageName());
@@ -126,10 +137,7 @@ public final class Induce implements InduceUnlock {
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         blueAdapter.getBluetoothLeScanner().stopScan(callbackIntent);
-        context.stopService(intent);
-        //断开所有连接
-        Log.e("关闭服务", "关闭服务成功");
-        return true;
+        return intent;
     }
 
 
